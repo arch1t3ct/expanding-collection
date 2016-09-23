@@ -9,19 +9,24 @@
 import UIKit
 
 struct ConstraintInfo {
-  var attribute: NSLayoutAttribute = .Left
-  var secondAttribute: NSLayoutAttribute = .NotAnAttribute
+  var attribute: NSLayoutAttribute = .left
+  var secondAttribute: NSLayoutAttribute = .notAnAttribute
   var constant: CGFloat = 0
   var identifier: String?
-  var relation: NSLayoutRelation = .Equal
+  var relation: NSLayoutRelation = .equal
 }
 
-infix operator >>>- { associativity left precedence 150 }
+precedencegroup MultiplicationPrecedence {
+    associativity: left
+    higherThan: AdditionPrecedence
+}
 
-func >>>- <T: UIView> (left: (T, T), @noescape block: (inout ConstraintInfo) -> ()) -> NSLayoutConstraint {
+infix operator >>>- : MultiplicationPrecedence
+
+func >>>- <T: UIView> (left: (T, T), block: (inout ConstraintInfo) -> ()) -> NSLayoutConstraint {
   var info = ConstraintInfo()
   block(&info)
-  info.secondAttribute = info.secondAttribute == .NotAnAttribute ? info.attribute : info.secondAttribute
+  info.secondAttribute = info.secondAttribute == .notAnAttribute ? info.attribute : info.secondAttribute
   
   let constraint = NSLayoutConstraint(item: left.1,
                                       attribute: info.attribute,
@@ -35,7 +40,7 @@ func >>>- <T: UIView> (left: (T, T), @noescape block: (inout ConstraintInfo) -> 
   return constraint
 }
 
-func >>>- <T: UIView> (left: T, @noescape block: (inout ConstraintInfo) -> ()) -> NSLayoutConstraint {
+func >>>- <T: UIView> (left: T, block: (inout ConstraintInfo) -> ()) -> NSLayoutConstraint {
   var info = ConstraintInfo()
   block(&info)
   
@@ -51,10 +56,10 @@ func >>>- <T: UIView> (left: T, @noescape block: (inout ConstraintInfo) -> ()) -
   return constraint
 }
 
-func >>>- <T: UIView> (left: (T, T, T), @noescape block: (inout ConstraintInfo) -> ()) -> NSLayoutConstraint {
+func >>>- <T: UIView> (left: (T, T, T), block: (inout ConstraintInfo) -> ()) -> NSLayoutConstraint {
   var info = ConstraintInfo()
   block(&info)
-  info.secondAttribute = info.secondAttribute == .NotAnAttribute ? info.attribute : info.secondAttribute
+  info.secondAttribute = info.secondAttribute == .notAnAttribute ? info.attribute : info.secondAttribute
   
   let constraint = NSLayoutConstraint(item: left.1,
                                       attribute: info.attribute,
@@ -72,13 +77,16 @@ func >>>- <T: UIView> (left: (T, T, T), @noescape block: (inout ConstraintInfo) 
 
 extension UIView {
   
-  func addScaleToFillConstratinsOnView(view: UIView) {
-    [NSLayoutAttribute.Left, .Right, .Top, .Bottom].forEach { attribute in
-      (self, view) >>>- { $0.attribute = attribute }
+  func addScaleToFillConstratinsOnView(_ view: UIView) {
+    [NSLayoutAttribute.left, .right, .top, .bottom].forEach { attribute in
+      _ = (self, view) >>>- {
+        $0.attribute = attribute
+        $0.constant = 0
+      }
     }
   }
   
-  func getConstraint(attributes: NSLayoutAttribute) -> NSLayoutConstraint? {
+  func getConstraint(_ attributes: NSLayoutAttribute) -> NSLayoutConstraint? {
     return constraints.filter {
       if $0.firstAttribute == attributes && $0.secondItem == nil {
         return true

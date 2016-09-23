@@ -9,12 +9,11 @@
 import UIKit
 
 class DemoTableViewController: ExpandingTableViewController {
-  
-  private var scrollOffsetY: CGFloat = 0
+  var scrollOffsetY: CGFloat = 0
   override func viewDidLoad() {
     super.viewDidLoad()
     configureNavBar()
-    let image1 = UIImage.Asset.BackgroundImage.image
+    let image1 = Asset.BackgroundImage.image
     tableView.backgroundView = UIImageView(image: image1)
   }
 }
@@ -22,34 +21,34 @@ class DemoTableViewController: ExpandingTableViewController {
 
 extension DemoTableViewController {
   
-  private func configureNavBar() {
-    navigationItem.leftBarButtonItem?.image = navigationItem.leftBarButtonItem?.image!.imageWithRenderingMode(UIImageRenderingMode.AlwaysOriginal)
-    navigationItem.rightBarButtonItem?.image = navigationItem.rightBarButtonItem?.image!.imageWithRenderingMode(UIImageRenderingMode.AlwaysOriginal)
+  func configureNavBar() {
+    navigationItem.leftBarButtonItem?.image = navigationItem.leftBarButtonItem?.image!.withRenderingMode(UIImageRenderingMode.alwaysOriginal)
+    navigationItem.rightBarButtonItem?.image = navigationItem.rightBarButtonItem?.image!.withRenderingMode(UIImageRenderingMode.alwaysOriginal)
   }
 }
 
 // MARK: Actions
 
 extension DemoTableViewController {
-  
-  @IBAction func backButtonHandler(sender: AnyObject) {
-    // buttonAnimation
-    let viewControllers: [DemoViewController?] = navigationController?.viewControllers.map { $0 as? DemoViewController } ?? []
-
-    for viewController in viewControllers {
-      if let rightButton = viewController?.navigationItem.rightBarButtonItem as? AnimatingBarButton {
-        rightButton.animationSelected(false)
+    
+    @IBAction func backButtonHandler(_ sender: UIBarButtonItem) {
+      // buttonAnimation
+      let viewControllers: [DemoViewController?] = navigationController?.viewControllers.map { $0 as? DemoViewController } ?? []
+        
+      for viewController in viewControllers {
+        if let rightButton = viewController?.navigationItem.rightBarButtonItem as? AnimatingBarButton {
+          rightButton.animationSelected(selected: false)
+        }
       }
+      popTransitionAnimation()
     }
-    popTransitionAnimation()
-  }
 }
 
 // MARK: UIScrollViewDelegate
 
 extension DemoTableViewController {
   
-  override func scrollViewDidScroll(scrollView: UIScrollView) {
+  override func scrollViewDidScroll(_ scrollView: UIScrollView) {
 //    if scrollView.contentOffset.y < -25 {
 //      // buttonAnimation
 //      let viewControllers: [DemoViewController?] = navigationController?.viewControllers.map { $0 as? DemoViewController } ?? []
